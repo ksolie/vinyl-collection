@@ -46,28 +46,33 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Center(
-        child: Stack(
-          children: albums.reversed.toList().asMap().entries.map((entry) {
-            int index = entry.key;
-            Album album = entry.value;
-            final double translationOffset = -0.1 * index;
-            final double rotationAngle = math.pi / 6;
-            return Align(
-              alignment: Alignment.center,
-              child: FractionalTranslation(
-                translation: Offset(translationOffset, 0.0),
-                child: Transform(
+      body: PageView.builder(
+        itemCount: 1, // Only one page with all albums
+        itemBuilder: (context, index) {
+          return Center(
+            child: Stack(
+              children: albums.reversed.toList().asMap().entries.map((entry) {
+                int index = entry.key;
+                Album album = entry.value;
+                final double translationOffset = -0.1 * index;
+                final double rotationAngle = math.pi / 6;
+                return Align(
                   alignment: Alignment.center,
-                  transform: Matrix4.identity()
-                    ..setEntry(3, 2, 0.003) // perspective
-                    ..rotateY(rotationAngle), // rotate around Y axis
-                  child: AlbumWidget(album: album),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
+                  child: FractionalTranslation(
+                    translation: Offset(translationOffset, 0.0),
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.003) // perspective
+                        ..rotateY(rotationAngle), // rotate around Y axis
+                      child: AlbumWidget(album: album),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+        },
       ),
     );
   }
