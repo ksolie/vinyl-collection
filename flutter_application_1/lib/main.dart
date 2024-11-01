@@ -46,57 +46,60 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: PageView.builder(
-        itemCount: albums.length,
-        itemBuilder: (context, index) {
-          return AlbumPage(album: albums[index]);
-        },
+      body: Center(
+        child: Stack(
+          children: albums.reversed.toList().asMap().entries.map((entry) {
+            int index = entry.key;
+            Album album = entry.value;
+            final double translationOffset = -0.1 * index;
+            final double rotationAngle = math.pi / 6;
+            return Align(
+              alignment: Alignment.center,
+              child: FractionalTranslation(
+                translation: Offset(translationOffset, 0.0),
+                child: Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.003) // perspective
+                    ..rotateY(rotationAngle), // rotate around Y axis
+                  child: AlbumWidget(album: album),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 }
 
-class AlbumPage extends StatelessWidget {
+class AlbumWidget extends StatelessWidget {
   final Album album;
 
-  const AlbumPage({super.key, required this.album});
+  const AlbumWidget({super.key, required this.album});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: FractionalTranslation(
-              translation: const Offset(-0.145, 0.0),
-              child: Transform(
-                alignment: Alignment.center,
-                transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.003) // perspective
-                  ..rotateY(math.pi / 6), // rotate around Y axis
-                child: SizedBox(
-                  width: 300,
-                  height: 300,
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Image.asset(
-                      album.coverPath,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 300,
+          height: 300,
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: Image.asset(
+              album.coverPath,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(height: 20),
-          Text(
-            album.title,
-            style: const TextStyle(fontSize: 24, color: Colors.white),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          album.title,
+          style: const TextStyle(fontSize: 24, color: Colors.white),
+        ),
+      ],
     );
   }
 }
